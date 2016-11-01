@@ -46,15 +46,12 @@ app.get('/login', passport.authenticate('saml',
     })
 );
 
-app.post('/login/callback', passport.authenticate('saml',
-    {
-      failureRedirect: '/',
-      failureFlash: true
-    }),
-  function (req, res) {
-    res.redirect('/');
-  }
-);
+app.post('/login/callback', function(req, res, next) {
+  passport.authenticate('saml', function(err, user, info) {
+    console.log('*********** authenticate');
+    console.log('*********** error ' + err);
+  })(req, res, next);
+});
 
 app.listen(process.env.PORT || 8080, '0.0.0.0', function () {
   console.log('Example app listening on port 3000!');
