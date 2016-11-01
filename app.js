@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var SamlStrategy = require('passport-saml').Strategy;
 var passport = require('passport');
+var config = require('./config');
 
 passport.serializeUser(function (user, done) {
   done(null, user);
@@ -15,8 +16,8 @@ passport.use(new SamlStrategy(
   {
     path: '/login/callback',
     entryPoint: 'https://dev-150273.oktapreview.com/app/phongadev412968_oktatestapp_1/exk8olutukb8ox6o30h7/sso/saml',
-    issuer: 'http://www.okta.com/exk8olutukb8ox6o30h7',
-    cert: null
+    issuer: 'passport-saml',
+    cert: config.cert
   },
   function (profile, done) {
     console.log('profile', profile);
