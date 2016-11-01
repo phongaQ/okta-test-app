@@ -17,7 +17,7 @@ passport.use(new SamlStrategy(
     path: '/login/callback',
     entryPoint: 'https://dev-150273.oktapreview.com/app/phongadev412968_oktatestapp_1/exk8olutukb8ox6o30h7/sso/saml',
     issuer: 'https://okta-test-app.herokuapp.com/login/callback',
-    cert: config.cert
+    cert: null
   },
   function (profile, done) {
     console.log('profile', profile);
