@@ -47,6 +47,7 @@ app.get('/login', passport.authenticate('saml',
 );
 
 app.post('/login/callback', function(req, res, next) {
+  console.log('callback!!!!');
   passport.authenticate('saml', function(err, user, info) {
     console.log('*********** authenticate');
     console.log('*********** error ' + err);
