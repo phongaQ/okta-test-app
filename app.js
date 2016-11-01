@@ -50,7 +50,7 @@ app.post('/login/callback', function(req, res, next) {
   passport.authenticate('saml', function(err, user, info) {
     console.log('*********** authenticate');
     console.log('*********** error ' + err);
-  })(req, res, next);
+  });
 });
 
 app.listen(process.env.PORT || 8080, '0.0.0.0', function () {
