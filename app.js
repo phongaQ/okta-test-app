@@ -3,12 +3,18 @@ var app = express();
 var SamlStrategy = require('passport-saml').Strategy;
 var passport = require('passport');
 var config = require('./config');
+var bodyParser = require('body-parser');
+var morgan = require('morgan');
+var compression = require('compression');
+var session = require('express-session');
 
 passport.serializeUser(function (user, done) {
+  console.log('serialize', user);
   done(null, user);
 });
 
 passport.deserializeUser(function (user, done) {
+  console.log('deserialize', user);
   done(null, user);
 });
 
@@ -17,26 +23,24 @@ passport.use(new SamlStrategy(
     path: '/login/callback',
     entryPoint: 'https://dev-150273.oktapreview.com/app/phongadev412968_oktatestapp_1/exk8olutukb8ox6o30h7/sso/saml',
     issuer: 'https://okta-test-app.herokuapp.com/login/callback',
-    cert: null
+    cert: config.cert
   },
   function (profile, done) {
     console.log('profile', profile);
-    return done(null,
-      {
-        id: profile.uid,
-        email: profile.email,
-        displayName: profile.cn,
-        firstName: profile.givenName,
-        lastName: profile.sn
-      });
+    return done(null, profile);
   })
 );
 
+app.use(morgan('combined'));
+app.use(compression());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded());
+app.use(session({ secret: "won't tell because it's secret"  }));
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.get('/', function (req, res) {
-  res.send('Hello World!');
+  res.end(JSON.stringify(req.session.passport.user));
 });
 
 app.get('/login', passport.authenticate('saml',
@@ -46,12 +50,8 @@ app.get('/login', passport.authenticate('saml',
     })
 );
 
-app.post('/login/callback', function(req, res, next) {
-  console.log('callback!!!!');
-  passport.authenticate('saml', function(err, user, info) {
-    console.log('*********** authenticate');
-    console.log('*********** error ' + err);
-  });
+app.post('/login/callback', passport.authenticate('saml', { failureRedirect: '/', failureFlash: true }), function (req, res) {
+  res.redirect('/');
 });
 
 app.listen(process.env.PORT || 8080, '0.0.0.0', function () {
